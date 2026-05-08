@@ -12,7 +12,9 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+
 app.use("/api/auth", authRoutes);
+app.use("/api/courses", require("./routes/courseRoutes"));
 
 app.get("/", (req, res) => {
   res.send("Server running");
