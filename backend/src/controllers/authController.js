@@ -4,20 +4,31 @@ const bcrypt = require("bcryptjs");
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
-  const hashed = await bcrypt.hash(password, 10);
-  const user = await User.create({ name, email, password: hashed });
+  const existingUser = await User.findOne({ email });
+  if (existingUser)
+    return res.status(400).json({ message: "User already exists" });
 
-  res.json({ message: "Registered", user });
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+  });
+
+  res.json({ message: "Signup successful", user });
 };
 
 const login = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.send("User not found");
+  const { email, password } = req.body;
 
-  const match = await bcrypt.compare(req.body.password, user.password);
-  if (!match) return res.send("Wrong password");
+  const user = await User.findOne({ email });
+  if (!user) return res.json({ message: "User not found" });
 
-  res.json({ message: "Login success", user });
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.json({ message: "Wrong password" });
+
+  res.json({ message: "Login successful", user });
 };
 
 module.exports = { register, login };
