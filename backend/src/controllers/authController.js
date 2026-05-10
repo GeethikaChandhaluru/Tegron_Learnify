@@ -1,34 +1,43 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
+// REGISTER
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  const existingUser = await User.findOne({ email });
-  if (existingUser)
-    return res.status(400).json({ message: "User already exists" });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  res.json({ message: "Signup successful", user });
+    res.json({ message: "User registered", user });
+  } catch (err) {
+    res.status(500).json({ message: "Error" });
+  }
 };
 
+// LOGIN
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) return res.json({ message: "User not found" });
+    const user = await User.findOne({ email });
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.json({ message: "Wrong password" });
+    if (!user) return res.status(400).json({ message: "User not found" });
 
-  res.json({ message: "Login successful", user });
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid password" });
+
+    res.json({ message: "Login successful", user });
+  } catch (err) {
+    res.status(500).json({ message: "Error" });
+  }
 };
 
 module.exports = { register, login };
