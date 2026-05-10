@@ -5,35 +5,36 @@ const addCourse = async (req, res) => {
     try {
         const { title, description, price } = req.body;
 
-        // basic validation
         if (!title || !description || !price) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.status(400).json({ message: "All fields required" });
         }
 
-        const course = await Course.create({
-            title,
-            description,
-            price,
-        });
+        const course = await Course.create({ title, description, price });
 
-        res.status(201).json({
-            message: "Course added successfully",
-            course,
-        });
-    } catch (error) {
+        res.status(201).json({ message: "Course added", course });
+    } catch (err) {
         res.status(500).json({ message: "Server error" });
     }
 };
 
-// 📥 Get All Courses
+// 📥 Get Courses
 const getCourses = async (req, res) => {
     try {
         const courses = await Course.find().sort({ createdAt: -1 });
-
-        res.status(200).json(courses);
-    } catch (error) {
-        res.status(500).json({ message: "Server error" });
+        res.json(courses);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching" });
     }
 };
 
-module.exports = { addCourse, getCourses };
+// ❌ Delete Course
+const deleteCourse = async (req, res) => {
+    try {
+        await Course.findByIdAndDelete(req.params.id);
+        res.json({ message: "Course deleted" });
+    } catch (err) {
+        res.status(500).json({ message: "Delete failed" });
+    }
+};
+
+module.exports = { addCourse, getCourses, deleteCourse };

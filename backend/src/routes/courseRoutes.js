@@ -4,12 +4,11 @@ const router = express.Router();
 const {
     addCourse,
     getCourses,
+    deleteCourse,
 } = require("../controllers/courseController");
 
-// ➕ Add Course
 router.post("/add", addCourse);
-
-// 📥 Get All Courses
 router.get("/", getCourses);
+router.delete("/:id", deleteCourse);
 
 module.exports = router;
