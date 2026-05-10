@@ -21,6 +21,8 @@ const register = async (req, res) => {
 };
 
 // LOGIN
+const jwt = require("jsonwebtoken");
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -34,7 +36,19 @@ const login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Invalid password" });
 
-    res.json({ message: "Login successful", user });
+    // 🔥 JWT Token generate
+    const token = jwt.sign(
+      { id: user._id },
+      "secretkey",
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,   // 👈 important
+      user
+    });
+
   } catch (err) {
     res.status(500).json({ message: "Error" });
   }
