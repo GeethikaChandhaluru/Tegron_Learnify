@@ -1,9 +1,15 @@
 const express = require("express");
-const { addCourse, getCourses } = require("../controllers/courseController");
-
 const router = express.Router();
 
-router.post("/", addCourse);
+const {
+    addCourse,
+    getCourses,
+} = require("../controllers/courseController");
+
+// ➕ Add Course
+router.post("/add", addCourse);
+
+// 📥 Get All Courses
 router.get("/", getCourses);
 
 module.exports = router;
