@@ -10,23 +10,11 @@ function Admin() {
 
     const addCourse = async () => {
         try {
-            if (!data.title || !data.description || !data.price) {
-                alert("Please fill all fields");
-                return;
-            }
-
-            const res = await axios.post(
-                "http://localhost:5000/api/courses/add",
-                data
-            );
-
-            alert(res.data.message || "Course added successfully");
-
-            // clear form after submit
+            await axios.post("http://localhost:5000/api/courses/add", data);
+            alert("Course added");
             setData({ title: "", description: "", price: "" });
-        } catch (error) {
-            console.log(error);
-            alert("Error adding course");
+        } catch {
+            alert("Error");
         }
     };
 
