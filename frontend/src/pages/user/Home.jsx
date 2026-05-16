@@ -50,30 +50,32 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="page-wrap section">
-                <FilterBar search={search} setSearch={setSearch} sort={sort} setSort={setSort} />
+            <div className="page-wrapper">
+                <div className="page-wrap section">
+                    <FilterBar search={search} setSearch={setSearch} sort={sort} setSort={setSort} />
 
-                {loading ? (
-                    <Loader />
-                ) : filtered.length === 0 ? (
-                    <div className="empty-state">
-                        <div className="empty-icon">📭</div>
-                        <h3>No books found</h3>
-                        <p>{search ? `No results for "${search}"` : 'No books available yet. Check back soon!'}</p>
-                        {search && <button className="btn btn-outline" onClick={() => setSearch('')}>Clear search</button>}
-                    </div>
-                ) : (
-                    <>
-                        <div style={{ marginBottom: '16px', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                            Showing <strong>{filtered.length}</strong> book{filtered.length !== 1 ? 's' : ''}
+                    {loading ? (
+                        <Loader />
+                    ) : filtered.length === 0 ? (
+                        <div className="empty-state">
+                            <div className="empty-icon">📭</div>
+                            <h3>No books found</h3>
+                            <p>{search ? `No results for "${search}"` : 'No books available yet. Check back soon!'}</p>
+                            {search && <button className="btn btn-outline" onClick={() => setSearch('')}>Clear search</button>}
                         </div>
-                        <div className="books-grid">
-                            {filtered.map((book, i) => (
-                                <BookCard key={book._id} book={book} delay={i * 60} />
-                            ))}
-                        </div>
-                    </>
-                )}
+                    ) : (
+                        <>
+                            <div style={{ marginBottom: '16px', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                                Showing <strong>{filtered.length}</strong> book{filtered.length !== 1 ? 's' : ''}
+                            </div>
+                            <div className="books-grid">
+                                {filtered.map((book, i) => (
+                                    <BookCard key={book._id} book={book} delay={i * 60} />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </>
     );

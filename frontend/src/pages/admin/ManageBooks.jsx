@@ -123,7 +123,18 @@ export default function ManageBooks() {
                                         )}
                                     </td>
                                     <td>
-                                        <div style={{ display: 'flex', gap: 8 }}>
+                                        {/* ✅ CHANGED: Three action buttons - Open Book, Edit, Delete */}
+                                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                            <button
+                                                className="btn btn-sm"
+                                                style={{
+                                                    background: 'var(--cyan)', color: '#fff',
+                                                    border: 'none', cursor: 'pointer',
+                                                }}
+                                                onClick={() => navigate(`/admin/book/${book._id}`)}
+                                            >
+                                                📖 Open
+                                            </button>
                                             <button className="btn btn-outline btn-sm"
                                                 onClick={() => navigate(`/admin/edit-book/${book._id}`)}>
                                                 ✏️ Edit

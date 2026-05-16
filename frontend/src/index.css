@@ -38,11 +38,13 @@ html {
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--light-gray);
+  background: #F5F7FA;
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
 }
 
 h1,
@@ -158,14 +160,45 @@ select {
 }
 
 /* ── Layout ────────────────────────────────────────────── */
+
+/* Root app container — centers the whole UI with side breathing room.
+   Applied in App.jsx. Does NOT wrap full-bleed elements (navbar, hero)
+   since those sit outside this container. */
+.app-container {
+  padding: 0 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Inner page wrapper — used inside individual pages for content padding */
+.page-wrapper {
+  padding: 20px;
+}
+
 .page-wrap {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 40px;
+  /* increased from 24px — fixes left-edge sticking */
 }
 
 .section {
   padding: 36px 0;
+  margin-bottom: 25px;
+}
+
+/* ── Global Main Container ─────────────────────────────── */
+.main-container {
+  padding: 20px 40px;
+}
+
+/* ── Card Spacing ──────────────────────────────────────── */
+.card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* ── Auth Layout ───────────────────────────────────────── */
@@ -474,7 +507,7 @@ select {
 .navbar-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 28px;
+  padding: 10px 40px;
   height: 66px;
   display: flex;
   align-items: center;
@@ -957,13 +990,14 @@ select {
 }
 
 .admin-content {
-  padding: 36px;
+  padding: 20px 36px;
   background: var(--light-gray);
   overflow-y: auto;
 }
 
 .admin-page-header {
   margin-bottom: 28px;
+  padding-bottom: 4px;
 }
 
 .admin-page-title {
@@ -995,6 +1029,7 @@ select {
   border: 1px solid var(--border-gray);
   animation: fadeInUp 0.45s ease both;
   transition: var(--transition);
+  margin-bottom: 0;
 }
 
 .stat-card:hover {
@@ -1117,7 +1152,7 @@ select {
 .page-hero-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 28px;
+  padding: 0 40px;
   position: relative;
   z-index: 1;
 }
@@ -1583,6 +1618,18 @@ select {
     padding: 0 16px;
   }
 
+  .main-container {
+    padding: 15px;
+  }
+
+  .app-container {
+    padding: 0 15px;
+  }
+
+  .page-wrapper {
+    padding: 15px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1640,5 +1687,545 @@ select {
 
   .book-card-actions {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COMMENT SECTION — light, clean, full-width below book grid
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Wrapper — full width below the book-detail-layout grid */
+.cs-section {
+  margin-top: 52px;
+  padding-top: 40px;
+  border-top: 2px solid var(--border-gray);
+}
+
+/* Heading row */
+.cs-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.cs-heading h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cs-count-badge {
+  background: var(--light-gray);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-gray);
+  border-radius: 99px;
+  padding: 2px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.cs-divider {
+  height: 1px;
+  background: var(--border-gray);
+  margin: 16px 0 24px;
+}
+
+/* Add-comment input row */
+.cs-add-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  align-items: center;
+}
+
+/* Shared input style */
+.cs-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-gray);
+  background: #ffffff;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cs-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(40, 199, 217, 0.12);
+}
+
+.cs-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Login prompt */
+.cs-login-prompt {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  background: var(--light-gray);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-gray);
+}
+
+/* Comment list container */
+.cs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Individual comment card */
+.cs-comment-card {
+  background: #ffffff;
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+
+.cs-comment-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Comment / Reply header row */
+.cs-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Avatar circle */
+.cs-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--orange-red);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.cs-avatar-sm {
+  width: 28px;
+  height: 28px;
+  font-size: 0.7rem;
+  background: var(--cyan);
+}
+
+/* Username + date */
+.cs-comment-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cs-username {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.cs-date {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+/* Comment body text */
+.cs-comment-text {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0 0 12px;
+  padding-left: 50px;
+  word-break: break-word;
+}
+
+/* Action buttons row */
+.cs-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 50px;
+  flex-wrap: wrap;
+}
+
+.cs-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cs-action-btn:hover {
+  background: var(--light-gray);
+}
+
+.cs-btn-like {
+  color: var(--text-secondary);
+}
+
+.cs-btn-like.liked {
+  color: #e53e3e;
+}
+
+.cs-btn-reply {
+  color: var(--cyan);
+}
+
+.cs-btn-delete {
+  color: #e53e3e;
+}
+
+/* Reply input row (indented) */
+.cs-reply-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-left: 50px;
+  align-items: center;
+}
+
+/* Replies container */
+.cs-replies-list {
+  margin-top: 12px;
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Individual reply card */
+.cs-reply-card {
+  background: #f8fafd;
+  border-left: 3px solid var(--cyan);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 10px 14px;
+}
+
+/* Reply body text */
+.cs-reply-text {
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  margin: 6px 0 8px;
+  padding-left: 40px;
+  word-break: break-word;
+}
+
+.cs-reply-actions {
+  padding-left: 40px;
+}
+
+/* Empty state */
+.cs-empty {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--text-secondary);
+  background: var(--light-gray);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-gray);
+}
+
+.cs-empty span {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.cs-empty p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Delete confirmation modal */
+.cs-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 42, 68, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+
+.cs-modal-box {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 36px 28px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+}
+
+.cs-modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.cs-modal-sub {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+}
+
+.cs-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cs-btn-danger {
+  min-width: 120px;
+  padding: 10px 22px;
+  background: #e53e3e;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cs-btn-danger:hover {
+  background: #c53030;
+}
+
+/* Responsive: stack reply input on small screens */
+@media (max-width: 600px) {
+
+  .cs-comment-text,
+  .cs-actions,
+  .cs-reply-input-row {
+    padding-left: 0;
+  }
+
+  .cs-replies-list {
+    padding-left: 16px;
+  }
+
+  .cs-reply-text,
+  .cs-reply-actions {
+    padding-left: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN RESPONSIVE ADDITIONS  ── append these rules to index.css
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Mobile top bar (hidden on desktop) ──────────────────────────── */
+.admin-mobile-topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #0A2238, #071929);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  gap: 10px;
+}
+
+.admin-mobile-logo {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  flex: 1;
+  text-align: center;
+}
+
+.admin-mobile-logo span {
+  color: var(--cyan);
+}
+
+.admin-hamburger {
+  background: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1.1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-mobile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.admin-mobile-logout {
+  background: rgba(240, 74, 42, 0.18);
+  border: 1.5px solid rgba(240, 74, 42, 0.5);
+  color: #fff;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Sidebar overlay (backdrop, mobile) ──────────────────────────── */
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 299;
+}
+
+/* ── Admin badge (used in CommentSection & AdminBookDetails) ─────── */
+.admin-reply-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #0A2238, #28c7d9);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* ── Responsive: 768px and below ─────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Show mobile topbar */
+  .admin-mobile-topbar {
+    display: flex;
+  }
+
+  /* Show overlay when sidebar is open */
+  .admin-sidebar-overlay {
+    display: block;
+  }
+
+  /* Grid: single column */
+  .admin-layout {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  /* Sidebar becomes a drawer */
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 260px;
+    height: 100vh;
+    z-index: 300;
+    transition: left 0.25s ease;
+    overflow-y: auto;
+  }
+
+  /* Open state: slide in */
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  /* Content fills full width, add padding for topbar */
+  .admin-content {
+    padding: 20px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 560px;
+  }
+
+  /* Stat/metric grids: 2 columns */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Admin page header: stack vertically */
+  .admin-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Action buttons: wrap nicely */
+  .btn-sm {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+
+  /* Back button: reduce size */
+  .back-btn {
+    font-size: 0.82rem;
+    padding: 7px 14px;
+    margin-bottom: 14px;
+  }
+}
+
+/* ── Extra small screens ─────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-content {
+    padding: 14px 12px;
   }
 }
