@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {
-    buyNow,
-    checkoutCart,
-    getMyOrders,
-    getPurchasedBooks,
+  buyNow,
+  checkoutCart,
+  getMyOrders,
+  getPurchasedBooks,
 } = require('../controllers/orderController');
 const { protect } = require('../middleware/authMiddleware');
 

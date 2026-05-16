@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const {
-    getAllUsers,
-    getAllOrders,
-    getPurchaseHistory,
-    getDashboardStats,
-    getPaymentAnalytics,
+  getAllUsers,
+  getAllOrders,
+  getPurchaseHistory,
+  getDashboardStats,
+  getPaymentAnalytics,
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 const { adminOnly } = require('../middleware/adminMiddleware');
