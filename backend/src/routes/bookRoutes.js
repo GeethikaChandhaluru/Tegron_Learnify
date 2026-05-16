@@ -9,58 +9,42 @@ const {
   deleteBook,
   likeBook,
   addComment,
-  toggleWishlist,
-  getWishlist,
+  deleteComment,
+  likeComment,
+  addReply,
+  deleteReply,
+  likeReply,
   uploadFields,
 } = require('../controllers/bookController');
 
-const { protect } = require('../middleware/authMiddleware');
+const { protect, optionalProtect } = require('../middleware/authMiddleware');
 const { adminOnly } = require('../middleware/adminMiddleware');
 
-// IMPORTANT:
-// wishlist route must come BEFORE /:id route
-// otherwise Express treats "wishlist" as :id
+// ── Public (optional auth so isLiked / isCommentLiked / isReplyLiked work) ──
+router.get('/', optionalProtect, getAllBooks);
+router.get('/:id', optionalProtect, getBook);
 
-// User feature routes
-
-// GET wishlist
-router.get('/wishlist/my', protect, getWishlist);
-
-// Public routes
-router.get('/', getAllBooks);
-router.get('/:id', getBook);
-
-// LIKE
+// ── Book Like ────────────────────────────────────────────────────────────────
 router.post('/:id/like', protect, likeBook);
 
-// COMMENT
+// ── Comments ─────────────────────────────────────────────────────────────────
 router.post('/:id/comment', protect, addComment);
+router.delete('/:id/comment/:commentId', protect, deleteComment);
 
-// WISHLIST toggle
-router.post('/:id/wishlist', protect, toggleWishlist);
+// ── Comment Like ─────────────────────────────────────────────────────────────
+router.post('/:id/comment/:commentId/like', protect, likeComment);
 
-// Admin routes
-router.post(
-  '/',
-  protect,
-  adminOnly,
-  uploadFields,
-  addBook
-);
+// ── Replies ──────────────────────────────────────────────────────────────────
+// addReply accepts optional body.parentReplyId for nested replies
+router.post('/:id/comment/:commentId/reply', protect, addReply);
+router.delete('/:id/comment/:commentId/reply/:replyId', protect, deleteReply);
 
-router.put(
-  '/:id',
-  protect,
-  adminOnly,
-  uploadFields,
-  updateBook
-);
+// ── Reply Like ───────────────────────────────────────────────────────────────
+router.post('/:id/comment/:commentId/reply/:replyId/like', protect, likeReply);
 
-router.delete(
-  '/:id',
-  protect,
-  adminOnly,
-  deleteBook
-);
+// ── Admin ────────────────────────────────────────────────────────────────────
+router.post('/', protect, adminOnly, uploadFields, addBook);
+router.put('/:id', protect, adminOnly, uploadFields, updateBook);
+router.delete('/:id', protect, adminOnly, deleteBook);
 
 module.exports = router;

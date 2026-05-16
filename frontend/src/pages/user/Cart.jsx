@@ -4,15 +4,14 @@ import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useCart } from '../../context/CartContext';
-import { checkoutCart } from '../../services/api';
+import { checkoutCart, getFileUrl } from '../../services/api';
 import toast from 'react-hot-toast';
-import { getFileUrl } from '../../services/api';
 
 export default function CartPage() {
     const navigate = useNavigate();
     const { cart, removeFromCart, clearCartLocal } = useCart();
     const [checkingOut, setCheckingOut] = useState(false);
-    const [toRemove, setToRemove] = useState(null); // { bookId, title }
+    const [toRemove, setToRemove] = useState(null);
     const [showCheckout, setShowCheckout] = useState(false);
 
     const items = cart?.items || [];
@@ -52,12 +51,30 @@ export default function CartPage() {
             </div>
 
             <div className="page-wrap section">
+
+                {/* ── Back button ── */}
+                <button
+                    className="btn btn-outline"
+                    onClick={() => navigate('/')}
+                    style={{
+                        borderRadius: '99px',
+                        padding: '9px 20px',
+                        fontSize: '0.85rem',
+                        marginBottom: '28px',
+                        gap: '6px',
+                    }}
+                >
+                    ← Back to Home
+                </button>
+
                 {items.length === 0 ? (
                     <div className="empty-state">
                         <div className="empty-icon">🛒</div>
                         <h3>Your cart is empty</h3>
                         <p>Browse our collection and add books you love</p>
-                        <button className="btn btn-primary" onClick={() => navigate('/')}>Browse Books</button>
+                        <button className="btn btn-primary" onClick={() => navigate('/')}>
+                            Browse Books
+                        </button>
                     </div>
                 ) : (
                     <div className="cart-layout">
@@ -76,9 +93,11 @@ export default function CartPage() {
                                             {item.book?.price === 0 ? 'FREE' : `₹${item.book?.price?.toFixed(2)}`}
                                         </p>
                                     </div>
-                                    <button className="btn btn-danger btn-sm"
+                                    <button
+                                        className="btn btn-danger btn-sm"
                                         style={{ flexShrink: 0 }}
-                                        onClick={() => setToRemove({ bookId: item.book._id, title: item.book.title })}>
+                                        onClick={() => setToRemove({ bookId: item.book._id, title: item.book.title })}
+                                    >
                                         🗑️ Remove
                                     </button>
                                 </div>
@@ -102,12 +121,19 @@ export default function CartPage() {
                                 <span>Total</span>
                                 <span style={{ color: 'var(--orange-red)' }}>₹{totalAmt.toFixed(2)}</span>
                             </div>
-                            <button className="btn btn-primary btn-full" style={{ marginTop: '20px' }}
-                                onClick={() => setShowCheckout(true)} disabled={checkingOut}>
+                            <button
+                                className="btn btn-primary btn-full"
+                                style={{ marginTop: '20px' }}
+                                onClick={() => setShowCheckout(true)}
+                                disabled={checkingOut}
+                            >
                                 {checkingOut ? 'Processing…' : '🚀 Checkout'}
                             </button>
-                            <button className="btn btn-outline btn-full" style={{ marginTop: '10px', fontSize: '0.875rem' }}
-                                onClick={() => navigate('/')}>
+                            <button
+                                className="btn btn-outline btn-full"
+                                style={{ marginTop: '10px', fontSize: '0.875rem' }}
+                                onClick={() => navigate('/')}
+                            >
                                 Continue Browsing
                             </button>
                         </div>
@@ -115,7 +141,6 @@ export default function CartPage() {
                 )}
             </div>
 
-            {/* Remove confirmation */}
             {toRemove && (
                 <ConfirmModal
                     icon="🗑️"
@@ -129,7 +154,6 @@ export default function CartPage() {
                 />
             )}
 
-            {/* Checkout confirmation */}
             {showCheckout && (
                 <ConfirmModal
                     icon="🚀"

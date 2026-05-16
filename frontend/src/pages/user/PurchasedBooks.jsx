@@ -40,6 +40,22 @@ export default function PurchasedBooks() {
             </div>
 
             <div className="page-wrap section">
+
+                {/* ── Back button ── */}
+                <button
+                    className="btn btn-outline"
+                    onClick={() => navigate('/')}
+                    style={{
+                        borderRadius: '99px',
+                        padding: '9px 20px',
+                        fontSize: '0.85rem',
+                        marginBottom: '28px',
+                        gap: '6px',
+                    }}
+                >
+                    ← Back to Home
+                </button>
+
                 {/* Stats */}
                 <div className="purchased-stats">
                     {[
