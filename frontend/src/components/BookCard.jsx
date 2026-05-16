@@ -101,8 +101,6 @@ export default function BookCard({ book, delay = 0 }) {
       <div className="book-card-body">
         <h3 className="book-card-title">{book.title}</h3>
 
-        <p className="book-card-author">by {book.author}</p>
-
         <p className="book-card-desc">{book.description}</p>
 
         <div className="book-card-price">
