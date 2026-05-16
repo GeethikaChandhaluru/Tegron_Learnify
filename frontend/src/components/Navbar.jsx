@@ -2,45 +2,96 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import ProfileDropdown from './ProfileDropdown';
 
 export default function Navbar() {
   const { user } = useAuth();
   const { cartCount } = useCart();
+
+  const {
+    wishlist = []
+  } = useWishlist();
+
+  const wishlistCount = wishlist?.length || 0;
+
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className="navbar">
       <div className="navbar-inner">
+
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          Tegron<span>Learnify</span>
+          Tegron<span>Notes</span>
         </Link>
 
-        {/* Desktop nav links — centred */}
+        {/* Desktop Links */}
         {user && (
           <ul className="navbar-links">
+
             <li>
-              <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>
+              <NavLink
+                to="/"
+                end
+                className={({ isActive }) =>
+                  isActive ? 'active' : ''
+                }
+              >
                 🏠 Home
               </NavLink>
             </li>
+
             <li>
-              <NavLink to="/purchased" className={({ isActive }) => isActive ? 'active' : ''}>
+              <NavLink
+                to="/purchased"
+                className={({ isActive }) =>
+                  isActive ? 'active' : ''
+                }
+              >
                 📚 My Books
               </NavLink>
             </li>
+
             <li>
-              <NavLink to="/cart" className={({ isActive }) => isActive ? 'active' : ''}>
-                🛒 Cart
-                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+              <NavLink
+                to="/wishlist"
+                className={({ isActive }) =>
+                  isActive ? 'active' : ''
+                }
+              >
+                ❤️ Wishlist
+
+                {wishlistCount > 0 && (
+                  <span className="cart-badge">
+                    {wishlistCount}
+                  </span>
+                )}
               </NavLink>
             </li>
+
+            <li>
+              <NavLink
+                to="/cart"
+                className={({ isActive }) =>
+                  isActive ? 'active' : ''
+                }
+              >
+                🛒 Cart
+
+                {cartCount > 0 && (
+                  <span className="cart-badge">
+                    {cartCount}
+                  </span>
+                )}
+              </NavLink>
+            </li>
+
           </ul>
         )}
 
-        {/* Right side */}
+        {/* Right Side */}
         <div className="navbar-right">
           {user ? (
             <ProfileDropdown />
@@ -48,14 +99,23 @@ export default function Navbar() {
             <>
               <button
                 className="btn btn-outline"
-                style={{ padding: '8px 20px', fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.2)' }}
+                style={{
+                  padding: '8px 20px',
+                  fontSize: '0.85rem',
+                  color: 'rgba(255,255,255,0.8)',
+                  borderColor: 'rgba(255,255,255,0.2)',
+                }}
                 onClick={() => navigate('/login')}
               >
                 Login
               </button>
+
               <button
                 className="btn btn-primary"
-                style={{ padding: '8px 20px', fontSize: '0.85rem' }}
+                style={{
+                  padding: '8px 20px',
+                  fontSize: '0.85rem',
+                }}
                 onClick={() => navigate('/signup')}
               >
                 Sign Up
@@ -63,23 +123,53 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Hamburger (mobile) */}
+          {/* Mobile Menu */}
           {user && (
-            <div className="navbar-hamburger" onClick={() => setMenuOpen(!menuOpen)}>
-              <span /><span /><span />
+            <div
+              className="navbar-hamburger"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <span />
+              <span />
+              <span />
             </div>
           )}
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile Dropdown */}
       {menuOpen && user && (
         <div className="mobile-menu">
-          <NavLink to="/" end onClick={() => setMenuOpen(false)}>🏠 Home</NavLink>
-          <NavLink to="/purchased" onClick={() => setMenuOpen(false)}>📚 My Books</NavLink>
-          <NavLink to="/cart" onClick={() => setMenuOpen(false)}>
+
+          <NavLink
+            to="/"
+            end
+            onClick={() => setMenuOpen(false)}
+          >
+            🏠 Home
+          </NavLink>
+
+          <NavLink
+            to="/purchased"
+            onClick={() => setMenuOpen(false)}
+          >
+            📚 My Books
+          </NavLink>
+
+          <NavLink
+            to="/wishlist"
+            onClick={() => setMenuOpen(false)}
+          >
+            ❤️ Wishlist {wishlistCount > 0 && `(${wishlistCount})`}
+          </NavLink>
+
+          <NavLink
+            to="/cart"
+            onClick={() => setMenuOpen(false)}
+          >
             🛒 Cart {cartCount > 0 && `(${cartCount})`}
           </NavLink>
+
         </div>
       )}
     </nav>

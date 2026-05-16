@@ -62,7 +62,7 @@ export default function ProfileDropdown() {
         <ConfirmModal
           icon="🚪"
           title="Logout?"
-          message="Are you sure you want to logout from Tegron Learnify?"
+          message="Are you sure you want to logout from Tegron Notes?"
           confirmText="Yes, Logout"
           cancelText="Stay"
           danger={false}

@@ -1549,17 +1549,7 @@ select {
   }
 
   .admin-sidebar {
-    position: fixed;
-    top: 0;
-    left: -260px;
-    width: 260px;
-    height: 100vh;
-    z-index: 1000;
-    transition: left 0.3s ease;
-  }
-
-  .admin-sidebar.open {
-    left: 0;
+    display: none;
   }
 
   .admin-content {
@@ -1650,40 +1640,5 @@ select {
 
   .book-card-actions {
     grid-template-columns: 1fr 1fr;
-  }
-}
-
-.admin-menu-btn {
-  display: none;
-}
-
-@media (max-width: 1024px) {
-  .admin-menu-btn {
-    display: block;
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    z-index: 1100;
-    background: var(--cyan);
-    color: white;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 20px;
-  }
-
-  .close-btn {
-    display: block;
-    margin-left: auto;
-    font-size: 24px;
-    background: none;
-    border: none;
-    color: white;
-    padding: 12px;
-  }
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
   }
 }
