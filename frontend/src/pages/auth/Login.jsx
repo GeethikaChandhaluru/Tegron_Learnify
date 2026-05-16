@@ -33,7 +33,7 @@ export default function Login() {
     return (
         <div className="auth-layout">
             <div className="auth-brand">
-                <div className="auth-brand-logo">Tegron <span>Learnify</span></div>
+                <div className="auth-brand-logo">Tegron <span>Notes</span></div>
                 <p className="auth-brand-tagline">
                     Your ultimate digital library. Thousands of books, one platform.
                     Learn, grow, and read at your own pace.
@@ -48,7 +48,7 @@ export default function Login() {
             <div className="auth-form-area">
                 <div className="auth-card">
                     <h2>Welcome Back</h2>
-                    <p className="subtitle">Sign in to your Tegron Learnify account</p>
+                    <p className="subtitle">Sign in to your Tegron Notes account</p>
 
                     {error && <div className="error-msg">⚠️ {error}</div>}
 

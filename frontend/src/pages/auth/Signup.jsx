@@ -34,9 +34,9 @@ export default function Signup() {
     return (
         <div className="auth-layout">
             <div className="auth-brand">
-                <div className="auth-brand-logo">Tegron <span>Learnify</span></div>
+                <div className="auth-brand-logo">Tegron <span>Notes</span></div>
                 <p className="auth-brand-tagline">
-                    Join thousands of students who trust Tegron Learnify for their learning journey.
+                    Join thousands of students who trust Tegron Notes for their learning journey.
                 </p>
                 <div className="auth-brand-deco">
                     {['📖 Read Anywhere', '🔒 Secure', '💡 Expert Authors', '🌍 Any Device'].map(t => (
