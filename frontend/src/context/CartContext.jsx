@@ -7,7 +7,7 @@ const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
-  const [cart, setCart]       = useState(null);
+  const [cart, setCart] = useState(null);
   const [cartCount, setCount] = useState(0);
 
   const loadCart = useCallback(async () => {
