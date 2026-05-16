@@ -6,6 +6,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { useCart } from '../../context/CartContext';
 import { checkoutCart } from '../../services/api';
 import toast from 'react-hot-toast';
+import { getFileUrl } from '../../services/api';
 
 export default function CartPage() {
     const navigate = useNavigate();
@@ -65,7 +66,7 @@ export default function CartPage() {
                             {items.map((item) => (
                                 <div key={item._id} className="cart-item">
                                     {item.book?.thumbnail ? (
-                                        <img src={item.book.thumbnail} alt={item.book.title} className="cart-item-img" />
+                                        <img src={getFileUrl(item.book.thumbnail)} alt={item.book.title} className="cart-item-img" />
                                     ) : (
                                         <div className="cart-item-img-placeholder">📖</div>
                                     )}
