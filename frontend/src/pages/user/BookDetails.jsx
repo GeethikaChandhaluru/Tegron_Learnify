@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { getFileUrl } from '../../services/api';
 
 import {
     getBook,
@@ -36,6 +37,12 @@ export default function BookDetails() {
     useEffect(() => {
         fetchBook();
     }, [id]);
+
+    useEffect(() => {
+        if (book) {
+            setLiked(book.isLiked || false);
+        }
+    }, [book]);
 
     const fetchBook = async () => {
         try {
@@ -75,10 +82,12 @@ export default function BookDetails() {
 
             setBook((prev) => ({
                 ...prev,
-                likes: data.likes
+                likes: data.likes,
+                isLiked: data.isLiked
             }));
 
             setLiked(data.isLiked);
+
             toast.success(data.message);
         } catch (err) {
             toast.error('Like update failed');
@@ -190,7 +199,7 @@ export default function BookDetails() {
                     <div>
                         {book.thumbnail ? (
                             <img
-                                src={book.thumbnail}
+                                src={getFileUrl(book.thumbnail)}
                                 alt={book.title}
                                 className="book-detail-img"
                             />

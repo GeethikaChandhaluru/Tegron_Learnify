@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
-import { getPurchasedBooks } from '../../services/api';
+import { getPurchasedBooks, getFileUrl } from '../../services/api';
 
 export default function PurchasedBooks() {
     const navigate = useNavigate();
@@ -89,7 +89,7 @@ export default function PurchasedBooks() {
                                     </button>
                                 </div>
                                 {active.pdfFile ? (
-                                    <iframe src={active.pdfFile} title="PDF Reader" style={{ flex: 1, border: 'none' }} />
+                                    <iframe src={getFileUrl(active.pdfFile)} title="PDF Reader" style={{ flex: 1, border: 'none' }} />
                                 ) : (
                                     <div style={{
                                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -117,7 +117,7 @@ export default function PurchasedBooks() {
                                     onClick={() => openBook(pb)}
                                 >
                                     {pb.book?.thumbnail ? (
-                                        <img src={pb.book.thumbnail} alt={pb.book.title}
+                                        <img src={getFileUrl(pb.book.thumbnail)} alt={pb.book.title}
                                             style={{ width: 70, height: 90, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
                                     ) : (
                                         <div style={{

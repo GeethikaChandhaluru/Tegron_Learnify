@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { getFileUrl } from '../services/api';
 
 import {
   buyNow,
@@ -23,13 +24,17 @@ export default function BookCard({
     isWishlisted
   } = useWishlist();
 
-  const [isLiked, setIsLiked] = useState(
-    book.isLiked || false
-  );
-
+  const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(
     book.likes || 0
   );
+
+  // IMPORTANT FIX:
+  // refresh / page revisit tarvata backend value ni sync cheyyadam
+  useEffect(() => {
+    setIsLiked(book.isLiked || false);
+    setLikesCount(book.likes || 0);
+  }, [book]);
 
   const handleBuyNow = async (e) => {
     e.stopPropagation();
@@ -57,7 +62,6 @@ export default function BookCard({
 
   const handleWishlist = async (e) => {
     e.stopPropagation();
-
     await toggleWishlist(book._id);
   };
 
@@ -94,12 +98,11 @@ export default function BookCard({
       >
         {book.thumbnail ? (
           <img
-            src={book.thumbnail}
+            src={getFileUrl(book.thumbnail)}
             alt={book.title}
             className="book-card-img"
             onError={(e) => {
-              e.target.style.display =
-                'none';
+              e.target.style.display = 'none';
             }}
           />
         ) : (
