@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'https://tegron-learnify.onrender.com/api',
 });
 
 // Attach token to every request
@@ -87,5 +87,5 @@ export const getAdminPayments = () => API.get('/admin/payments');
 export const getFileUrl = (filePath) => {
     if (!filePath) return '';
     if (filePath.startsWith('http')) return filePath;
-    return `http://localhost:5000/${filePath.replace(/^\/+/, '')}`;
+    return `https://tegron-learnify.onrender.com/${filePath.replace(/^\/+/, '')}`;
 };
