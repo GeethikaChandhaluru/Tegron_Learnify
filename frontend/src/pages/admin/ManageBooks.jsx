@@ -5,6 +5,7 @@ import Loader from '../../components/Loader';
 import ConfirmModal from '../../components/ConfirmModal';
 import { getAllBooks, deleteBook } from '../../services/api';
 import toast from 'react-hot-toast';
+import { getFileUrl } from '../../services/api';
 
 export default function ManageBooks() {
     const navigate = useNavigate();
@@ -96,7 +97,7 @@ export default function ManageBooks() {
                                 <tr key={book._id}>
                                     <td>
                                         {book.thumbnail ? (
-                                            <img src={book.thumbnail} alt={book.title}
+                                            <img src={getFileUrl(book.thumbnail)} alt={book.title}
                                                 style={{ width: 44, height: 56, objectFit: 'cover', borderRadius: 6 }} />
                                         ) : (
                                             <div style={{

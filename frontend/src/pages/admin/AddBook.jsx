@@ -4,6 +4,7 @@ import AdminLayout from './AdminLayout';
 import Loader from '../../components/Loader';
 import { addBook, updateBook, getBook } from '../../services/api';
 import toast from 'react-hot-toast';
+import { getFileUrl } from '../../services/api';
 
 const emptyForm = { title: '', description: '', price: '', bookUrl: '' };
 
