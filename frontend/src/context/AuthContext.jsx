@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     const { data } = await apiSignup({ username, email, password });
     localStorage.setItem('tn_token', data.data.token);
     setUser(data.data);
-    toast.success('Account created! Welcome to Tegron Learnify 📚');
+    toast.success('Account created! Welcome to Tegron Notes 📚');
     return data.data;
   };
 
