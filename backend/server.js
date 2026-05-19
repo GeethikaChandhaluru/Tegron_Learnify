@@ -65,6 +65,7 @@ io.on('connection', (socket) => {
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
     origin: [
+        "http://localhost:5173",
         "https://tegronlearnify.vercel.app"
     ],
     credentials: true
