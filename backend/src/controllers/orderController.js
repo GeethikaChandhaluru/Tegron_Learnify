@@ -71,10 +71,18 @@ const buyNow = asyncHandler(async (req, res) => {
     order._id
   );
 
-  // ── Emit real-time event to admin ─────────────────────
   const io = getIO(req);
   if (io) {
-    io.emit('newOrder', {
+    // ── Notify the purchasing user's private room ─────────
+    io.to(`user:${buyer._id}`).emit('balanceUpdated', {
+      newBalance: buyer.balance,
+      reason: 'purchase',
+      bookTitle: book.title,
+      amount: book.price,
+    });
+
+    // ── Broadcast new order to admin room ─────────────────
+    io.to('room:admin').emit('newOrder', {
       orderId: order._id,
       user: { _id: buyer._id, username: buyer.username, email: buyer.email },
       book: { _id: book._id, title: book.title, price: book.price },
@@ -149,10 +157,18 @@ const checkoutCart = asyncHandler(async (req, res) => {
   cart.items = [];
   await cart.save();
 
-  // ── Emit real-time event to admin ─────────────────────
   const io = getIO(req);
   if (io) {
-    io.emit('newOrder', {
+    // ── Notify the purchasing user's private room ─────────
+    io.to(`user:${buyer._id}`).emit('balanceUpdated', {
+      newBalance: buyer.balance,
+      reason: 'purchase',
+      booksCount: orderBooks.length,
+      amount: totalAmount,
+    });
+
+    // ── Broadcast new order to admin room ─────────────────
+    io.to('room:admin').emit('newOrder', {
       orderId: order._id,
       user: { _id: buyer._id, username: buyer.username, email: buyer.email },
       booksCount: orderBooks.length,
