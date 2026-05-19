@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { updateProfile } from '../../services/api';
 import Navbar from '../../components/Navbar';
@@ -22,7 +23,8 @@ const resolveAvatar = (profilePic) => {
 };
 
 export default function UserProfile() {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, logout } = useAuth();
+    const navigate = useNavigate();
     const [username, setUsername] = useState(user?.username || '');
     const [saving, setSaving] = useState(false);
     const [preview, setPreview] = useState(null);
@@ -57,6 +59,14 @@ export default function UserProfile() {
             toast.error(err?.response?.data?.message || 'Update failed');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleLogout = () => {
+        const confirmLogout = window.confirm('Do you really want to logout?');
+        if (confirmLogout) {
+            logout();
+            navigate('/login');
         }
     };
 
@@ -152,6 +162,10 @@ export default function UserProfile() {
                                 </div>
                             ))}
                         </div>
+
+                        <button className="logout-btn" onClick={handleLogout}>
+                            🚪 Logout
+                        </button>
                     </div>
 
                 </div>
@@ -164,3 +178,27 @@ const cardStyle = { background: '#fff', borderRadius: 'var(--radius-lg)', border
 const sectionTitle = { fontFamily: 'Syne,sans-serif', color: 'var(--navy)', fontSize: '1rem', marginBottom: 20 };
 const labelStyle = { display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' };
 const inputStyle = { width: '100%', padding: '10px 14px', border: '1.5px solid var(--border-gray)', borderRadius: 'var(--radius-md)', fontSize: '0.9rem', color: 'var(--navy)', background: '#f9fafb', boxSizing: 'border-box', outline: 'none' };
+
+// Inject logout button styles once
+const style = document.createElement('style');
+style.textContent = `
+  .logout-btn {
+    background: #F04A2A;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .logout-btn:hover {
+    background: #C63D22;
+  }
+`;
+if (!document.head.querySelector('[data-logout-styles]')) {
+    style.setAttribute('data-logout-styles', '');
+    document.head.appendChild(style);
+}
