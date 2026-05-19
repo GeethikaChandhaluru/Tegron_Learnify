@@ -28,6 +28,7 @@ export default function AdminDashboard() {
 
         socket.on('connect', () => {
             console.log('Admin dashboard connected to socket');
+            socket.emit('joinAdminRoom');
         });
 
         socket.on('newOrder', (orderData) => {
