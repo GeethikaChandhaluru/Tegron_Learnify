@@ -1,9 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: "https://tegron-learnify.onrender.com/api"
+    baseURL: "http://localhost:5000/api"
 });
-
 // Attach token to every request
 API.interceptors.request.use((config) => {
     const token = localStorage.getItem('tn_token');
