@@ -13,7 +13,7 @@ export default function BookDetails() {
     const navigate = useNavigate();
 
     const { addToCart } = useCart();
-    const { user } = useAuth();
+    const { user, updateBalance } = useAuth();   // ← updateBalance added
 
     const [book, setBook] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,7 +42,11 @@ export default function BookDetails() {
     const handleBuyNow = async () => {
         setBuying(true);
         try {
-            await buyNow(book._id);
+            const { data } = await buyNow(book._id);
+            // Update balance instantly without page reload
+            if (data.newBalance !== undefined) {
+                updateBalance(data.newBalance);
+            }
             setShowSuccess(true);
         } catch (err) {
             toast.error(err.response?.data?.message || 'Purchase failed');
@@ -58,144 +62,143 @@ export default function BookDetails() {
             setLiked(data.isLiked);
             toast.success(data.message);
         } catch {
-            toast.error('Like update failed');
+            toast.error('Could not update like');
         }
     };
 
-    const handleCommentsUpdate = (updatedComments) => {
-        setBook((prev) => ({ ...prev, comments: updatedComments }));
-    };
-
     if (loading) return <><Navbar /><Loader /></>;
-    if (!book) return null;
+
+    const isPurchased = book?.isPurchased;
+    const BASE = 'https://tegron-learnify.onrender.com';
 
     return (
         <>
             <Navbar />
+            <div className="app-container" style={{ paddingTop: 32, paddingBottom: 60 }}>
 
-            {/* Purchase success modal */}
-            {showSuccess && (
-                <div className="modal-overlay">
-                    <div className="modal-box">
-                        <div className="modal-icon">🎉</div>
-                        <h3>Order Confirmed!</h3>
-                        <p>
-                            <strong>{book.title}</strong>{' '}has been added to your
-                            library. Head to <em>My Books</em> to start reading.
-                        </p>
-                        <div className="modal-actions">
-                            <button className="btn btn-outline" onClick={() => navigate('/')}>
-                                Browse More
-                            </button>
+                {showSuccess && (
+                    <div style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                    }}>
+                        <div style={{
+                            background: '#fff', borderRadius: 'var(--radius-lg)', padding: 40,
+                            textAlign: 'center', maxWidth: 400, width: '90%',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+                        }}>
+                            <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎉</div>
+                            <h2 style={{ fontFamily: 'Syne,sans-serif', color: 'var(--navy)', marginBottom: 8 }}>
+                                Purchase Successful!
+                            </h2>
+                            <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
+                                You now have access to <strong>{book.title}</strong>. Your wallet has been updated.
+                            </p>
                             <button className="btn btn-primary" onClick={() => navigate('/purchased')}>
-                                📚 Go to My Books
+                                Go to My Books
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {/* Back */}
+                <button
+                    onClick={() => navigate(-1)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                    ← Back
+                </button>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 40, alignItems: 'start' }}>
+                    {/* Cover */}
+                    <div>
+                        <img
+                            src={book.thumbnail ? `${BASE}/${book.thumbnail}` : '/placeholder.png'}
+                            alt={book.title}
+                            style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)' }}
+                            onError={(e) => { e.target.src = '/placeholder.png'; }}
+                        />
+                    </div>
+
+                    {/* Info */}
+                    <div>
+                        <div style={{ marginBottom: 6 }}>
+                            <span style={{ background: 'var(--cyan)', color: '#fff', padding: '3px 12px', borderRadius: 100, fontSize: '0.75rem', fontWeight: 600 }}>
+                                {book.category}
+                            </span>
+                        </div>
+                        <h1 style={{ fontFamily: 'Syne,sans-serif', color: 'var(--navy)', fontSize: '1.9rem', margin: '12px 0 6px' }}>
+                            {book.title}
+                        </h1>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: 20 }}>by {book.author}</p>
+
+                        <p style={{ color: 'var(--text-primary)', lineHeight: 1.7, marginBottom: 24 }}>
+                            {book.description}
+                        </p>
+
+                        {/* Price + wallet info */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                            <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--navy)' }}>
+                                ₹{book.price}
+                            </span>
+                            {!isPurchased && user && (
+                                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', background: '#f1f5f9', padding: '4px 12px', borderRadius: 100 }}>
+                                    Your balance: ₹{(user.balance ?? 0).toFixed(2)}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+                            {isPurchased ? (
+                                <button className="btn btn-primary" onClick={() => navigate('/purchased')}>
+                                    📖 Read Now
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={handleBuyNow}
+                                        disabled={buying}
+                                    >
+                                        {buying ? 'Processing…' : '⚡ Buy Now'}
+                                    </button>
+                                    <button
+                                        className="btn btn-outline"
+                                        onClick={() => addToCart(book._id)}
+                                    >
+                                        🛒 Add to Cart
+                                    </button>
+                                </>
+                            )}
+
+                            {/* Like */}
+                            <button
+                                onClick={handleLike}
+                                style={{
+                                    background: liked ? 'rgba(239,68,68,0.1)' : 'transparent',
+                                    border: `1.5px solid ${liked ? '#ef4444' : 'var(--border-gray)'}`,
+                                    borderRadius: 'var(--radius-md)', padding: '10px 18px',
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                    color: liked ? '#ef4444' : 'var(--text-secondary)',
+                                    fontSize: '0.9rem', transition: 'all 0.2s',
+                                }}
+                            >
+                                {liked ? '❤️' : '🤍'} {book.likes || 0}
+                            </button>
+                        </div>
+
+                        {/* Insufficient balance warning */}
+                        {!isPurchased && user && user.balance < book.price && (
+                            <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 'var(--radius-md)', padding: '12px 16px', marginBottom: 16, color: '#dc2626', fontSize: '0.85rem' }}>
+                                ⚠️ Insufficient balance. You need ₹{book.price} but have ₹{(user.balance ?? 0).toFixed(2)}.
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
 
-            <div className="page-wrapper">
-                <div className="page-wrap section">
-
-                    {/* ── Back button (replaces breadcrumb) ── */}
-                    <button
-                        className="btn btn-outline"
-                        onClick={() => navigate('/')}
-                        style={{
-                            borderRadius: '99px',
-                            padding: '9px 20px',
-                            fontSize: '0.85rem',
-                            marginBottom: '28px',
-                            gap: '6px',
-                        }}
-                    >
-                        ← Back to Books
-                    </button>
-
-                    {/* ── Book info grid ── */}
-                    <div className="book-detail-layout animate-fade-up">
-
-                        {/* Left: thumbnail */}
-                        <div>
-                            {book.thumbnail ? (
-                                <img
-                                    src={getFileUrl(book.thumbnail)}
-                                    alt={book.title}
-                                    className="book-detail-img"
-                                />
-                            ) : (
-                                <div className="book-detail-img"
-                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem', background: 'var(--light-gray)' }}>
-                                    📖
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Right: details */}
-                        <div className="book-detail-info">
-                            {book.category && book.category !== 'General' && (
-                                <span className="book-detail-category">{book.category}</span>
-                            )}
-
-                            <h1 className="book-detail-title">{book.title}</h1>
-
-                            <div className="book-detail-price">
-                                {book.price === 0 ? 'FREE' : `₹${book.price.toFixed(2)}`}
-                            </div>
-
-                            <p className="book-detail-desc">{book.description}</p>
-
-                            {/* Like button */}
-                            <div style={{ marginBottom: '24px' }}>
-                                <button
-                                    className="btn btn-outline"
-                                    onClick={handleLike}
-                                    style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        fontWeight: 600,
-                                        borderColor: liked ? '#e53e3e' : undefined,
-                                        color: liked ? '#e53e3e' : undefined,
-                                        transition: 'all 0.2s',
-                                    }}
-                                >
-                                    {liked ? '❤️' : '🤍'}
-                                    {liked ? 'Liked' : 'Like'}
-                                    <span style={{
-                                        background: liked ? '#e53e3e' : 'rgba(0,0,0,0.07)',
-                                        color: liked ? '#fff' : 'inherit',
-                                        borderRadius: '99px',
-                                        padding: '1px 8px',
-                                        fontSize: '0.8rem',
-                                    }}>
-                                        {book.likes || 0}
-                                    </span>
-                                </button>
-                            </div>
-
-                            {/* Cart / Buy */}
-                            <div className="book-detail-actions">
-                                <button className="btn btn-outline" onClick={() => addToCart(book._id)}>
-                                    🛒 Add to Cart
-                                </button>
-                                <button className="btn btn-primary" onClick={handleBuyNow} disabled={buying}>
-                                    {buying ? 'Processing…' : '⚡ Buy Now'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    {/* ── END book info grid ── */}
-
-                    {/* ── Comments — full width below grid ── */}
-                    <CommentSection
-                        bookId={book._id}
-                        comments={book.comments || []}
-                        currentUserId={user?._id}
-                        onCommentsUpdate={handleCommentsUpdate}
-                    />
-
+                {/* Comments */}
+                <div style={{ marginTop: 48 }}>
+                    <CommentSection bookId={book._id} />
                 </div>
             </div>
         </>

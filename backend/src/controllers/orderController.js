@@ -3,18 +3,29 @@ const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 const Book = require('../models/Book');
 const PurchasedBook = require('../models/PurchasedBook');
+const User = require('../models/User');
 
 // Helper: create purchased book records
 const createPurchasedBooks = async (userId, books, orderId) => {
   const ops = books.map(({ book, price }) => ({
     updateOne: {
       filter: { user: userId, book: book._id || book },
-      update: { $setOnInsert: { user: userId, book: book._id || book, order: orderId, pricePaid: price } },
+      update: {
+        $setOnInsert: {
+          user: userId,
+          book: book._id || book,
+          order: orderId,
+          pricePaid: price,
+        },
+      },
       upsert: true,
     },
   }));
   if (ops.length) await PurchasedBook.bulkWrite(ops);
 };
+
+// Helper: get io instance from req.app
+const getIO = (req) => req.app.get('io');
 
 // @desc    Buy Now (single book)
 // @route   POST /api/orders/buy-now/:bookId
@@ -36,6 +47,17 @@ const buyNow = asyncHandler(async (req, res) => {
     throw new Error('You have already purchased this book');
   }
 
+  // ── Wallet: check balance ─────────────────────────────
+  const buyer = await User.findById(req.user._id);
+  if (buyer.balance < book.price) {
+    res.status(402);
+    throw new Error('Insufficient balance. Please top up your wallet.');
+  }
+
+  // ── Deduct balance ────────────────────────────────────
+  buyer.balance = parseFloat((buyer.balance - book.price).toFixed(2));
+  await buyer.save({ validateBeforeSave: false });
+
   const order = await Order.create({
     user: req.user._id,
     books: [{ book: book._id, price: book.price }],
@@ -43,12 +65,29 @@ const buyNow = asyncHandler(async (req, res) => {
     status: 'completed',
   });
 
-  await createPurchasedBooks(req.user._id, [{ book: book._id, price: book.price }], order._id);
+  await createPurchasedBooks(
+    req.user._id,
+    [{ book: book._id, price: book.price }],
+    order._id
+  );
+
+  // ── Emit real-time event to admin ─────────────────────
+  const io = getIO(req);
+  if (io) {
+    io.emit('newOrder', {
+      orderId: order._id,
+      user: { _id: buyer._id, username: buyer.username, email: buyer.email },
+      book: { _id: book._id, title: book.title, price: book.price },
+      totalAmount: book.price,
+      createdAt: order.createdAt,
+    });
+  }
 
   res.status(201).json({
     success: true,
     message: 'Purchase successful!',
     data: order,
+    newBalance: buyer.balance,
   });
 });
 
@@ -86,6 +125,17 @@ const checkoutCart = asyncHandler(async (req, res) => {
 
   const totalAmount = orderBooks.reduce((sum, item) => sum + item.price, 0);
 
+  // ── Wallet: check balance ─────────────────────────────
+  const buyer = await User.findById(req.user._id);
+  if (buyer.balance < totalAmount) {
+    res.status(402);
+    throw new Error(`Insufficient balance. You need ₹${totalAmount} but have ₹${buyer.balance.toFixed(2)}.`);
+  }
+
+  // ── Deduct balance ────────────────────────────────────
+  buyer.balance = parseFloat((buyer.balance - totalAmount).toFixed(2));
+  await buyer.save({ validateBeforeSave: false });
+
   const order = await Order.create({
     user: req.user._id,
     books: orderBooks,
@@ -99,10 +149,23 @@ const checkoutCart = asyncHandler(async (req, res) => {
   cart.items = [];
   await cart.save();
 
+  // ── Emit real-time event to admin ─────────────────────
+  const io = getIO(req);
+  if (io) {
+    io.emit('newOrder', {
+      orderId: order._id,
+      user: { _id: buyer._id, username: buyer.username, email: buyer.email },
+      booksCount: orderBooks.length,
+      totalAmount,
+      createdAt: order.createdAt,
+    });
+  }
+
   res.status(201).json({
     success: true,
     message: 'Checkout successful!',
     data: order,
+    newBalance: buyer.balance,
   });
 });
 
@@ -135,4 +198,12 @@ const getPurchasedBooks = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { buyNow, checkoutCart, getMyOrders, getPurchasedBooks };
+// @desc    Get current wallet balance
+// @route   GET /api/orders/wallet
+// @access  Private
+const getWalletBalance = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select('balance');
+  res.json({ success: true, balance: user.balance });
+});
+
+module.exports = { buyNow, checkoutCart, getMyOrders, getPurchasedBooks, getWalletBalance };

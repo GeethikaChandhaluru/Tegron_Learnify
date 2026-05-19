@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'https://tegron-learnify.onrender.com/api',
+    baseURL: "https://tegron-learnify.onrender.com/api"
 });
 
 // Attach token to every request
@@ -19,6 +19,11 @@ export const login = (data) => API.post('/auth/login', data);
 export const getMe = () => API.get('/auth/me');
 export const forgotPassword = (data) => API.post('/auth/forgot-password', data);
 export const resetPassword = (token, data) => API.put(`/auth/reset-password/${token}`, data);
+
+// ── PROFILE ───────────────────────────────────────────────────────────────────
+
+// Pass a FormData object; can contain 'username' and/or 'profilePic' (file)
+export const updateProfile = (payload) => API.put("/auth/profile", payload);
 
 // ── BOOKS ────────────────────────────────────────────────────────────────────
 
@@ -43,8 +48,6 @@ export const likeComment = (bookId, commentId) =>
     API.post(`/books/${bookId}/comment/${commentId}/like`);
 
 // ── REPLIES ───────────────────────────────────────────────────────────────────
-// parentReplyId: null/omitted = direct reply to comment
-//               <id string>  = nested reply (reply to another reply)
 
 export const addReply = (bookId, commentId, text, parentReplyId = null) =>
     API.post(`/books/${bookId}/comment/${commentId}/reply`, {
@@ -63,29 +66,31 @@ export const likeReply = (bookId, commentId, replyId) =>
 // ── CART ─────────────────────────────────────────────────────────────────────
 
 export const getCart = () => API.get('/cart');
-export const addToCart = (id) => API.post(`/cart/${id}`);
-export const removeFromCart = (id) => API.delete(`/cart/${id}`);
+export const addToCart = (bookId) => API.post('/cart', { bookId });
+export const removeFromCart = (bookId) => API.delete(`/cart/${bookId}`);
 export const clearCart = () => API.delete('/cart');
 
-// ── ORDERS ────────────────────────────────────────────────────────────────────
+// ── ORDERS ───────────────────────────────────────────────────────────────────
 
-export const buyNow = (id) => API.post(`/orders/buy-now/${id}`);
+export const buyNow = (bookId) => API.post(`/orders/buy-now/${bookId}`);
 export const checkoutCart = () => API.post('/orders/checkout');
 export const getMyOrders = () => API.get('/orders');
 export const getPurchasedBooks = () => API.get('/orders/purchased');
+export const getWalletBalance = () => API.get('/orders/wallet');
 
-// ── ADMIN ─────────────────────────────────────────────────────────────────────
-
-export const getAdminStats = () => API.get('/admin/stats');
-export const getAdminUsers = () => API.get('/admin/users');
-export const getAdminOrders = () => API.get('/admin/orders');
-export const getAdminPurchased = () => API.get('/admin/purchased');
-export const getAdminPayments = () => API.get('/admin/payments');
-
-// ── FILE URL ──────────────────────────────────────────────────────────────────
+// ── FILE URL HELPER ───────────────────────────────────────────────────────────
 
 export const getFileUrl = (filePath) => {
     if (!filePath) return '';
     if (filePath.startsWith('http')) return filePath;
     return `https://tegron-learnify.onrender.com/${filePath.replace(/^\/+/, '')}`;
 };
+
+// ── ADMIN ────────────────────────────────────────────────────────────────────
+
+export const getAdminStats = () => API.get('/admin/stats');
+export const getAdminPayments = () => API.get('/admin/payments');
+export const getAdminUsers = () => API.get('/admin/users');
+export const getAllUsers = () => API.get('/admin/users');       // alias
+export const getAdminOrders = () => API.get('/admin/orders');
+export const getAllOrders = () => API.get('/admin/orders');     // alias
