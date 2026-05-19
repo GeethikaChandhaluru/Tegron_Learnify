@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { login as apiLogin, signup as apiSignup, getMe, updateProfile as apiUpdateProfile } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -43,9 +43,12 @@ export const AuthProvider = ({ children }) => {
     toast('Logged out. See you soon!', { icon: '👋' });
   };
 
-  // Update balance locally after purchase (no re-fetch needed)
+  // Update balance locally after purchase — spreads into new object to guarantee re-render
   const updateBalance = useCallback((newBalance) => {
-    setUser((prev) => prev ? { ...prev, balance: newBalance } : prev);
+    setUser((prev) => {
+      if (!prev) return prev;
+      return { ...prev, balance: Number(newBalance) };
+    });
   }, []);
 
   // Update user profile data locally
@@ -61,8 +64,16 @@ export const AuthProvider = ({ children }) => {
     } catch { /* ignore */ }
   }, []);
 
+  // Memoize context value — only recreates when user or loading actually changes.
+  // This guarantees ALL consumers (Navbar, etc.) re-render when balance changes.
+  const value = useMemo(
+    () => ({ user, loading, login, register, logout, updateBalance, updateUser, refreshUser }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, loading]
+  );
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateBalance, updateUser, refreshUser }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
