@@ -1,19 +1,60 @@
 import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import AdminLayout from './AdminLayout';
 import Loader from '../../components/Loader';
 import { getAdminStats } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
+
+const SOCKET_URL = 'https://tegron-learnify.onrender.com';
 
 export default function AdminDashboard() {
     const { user } = useAuth();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [liveOrders, setLiveOrders] = useState([]);
 
+    // Fetch initial stats
     useEffect(() => {
         getAdminStats()
             .then(({ data }) => setStats(data.data))
             .catch(console.error)
             .finally(() => setLoading(false));
+    }, []);
+
+    // ── Socket.io: listen for new orders ──────────────────────────────────────
+    useEffect(() => {
+        const socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+
+        socket.on('connect', () => {
+            console.log('Admin dashboard connected to socket');
+        });
+
+        socket.on('newOrder', (orderData) => {
+            // Show toast notification
+            toast.success(
+                `🛒 New order from ${orderData.user?.username || 'a user'} — ₹${orderData.totalAmount}`,
+                { duration: 5000 }
+            );
+
+            // Update live orders list (most recent first, cap at 10)
+            setLiveOrders((prev) => [orderData, ...prev].slice(0, 10));
+
+            // Increment stats counters optimistically
+            setStats((prev) =>
+                prev
+                    ? {
+                        ...prev,
+                        totalOrders: (prev.totalOrders || 0) + 1,
+                        totalRevenue: (prev.totalRevenue || 0) + orderData.totalAmount,
+                    }
+                    : prev
+            );
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     return (
@@ -34,6 +75,56 @@ export default function AdminDashboard() {
                             <div className={`stat-card-value ${s.color}`}>{s.value ?? 0}</div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* ── Live Order Feed ──────────────────────────────────────────── */}
+            {liveOrders.length > 0 && (
+                <div style={{
+                    background: '#fff', borderRadius: 'var(--radius-lg)',
+                    padding: '28px', border: '1px solid var(--border-gray)',
+                    boxShadow: 'var(--shadow-sm)', marginBottom: 24,
+                }}>
+                    <h3 style={{ fontFamily: 'Syne,sans-serif', marginBottom: 16, color: 'var(--navy)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        ⚡ Live Orders
+                        <span style={{ background: '#ef4444', color: '#fff', fontSize: '0.7rem', padding: '2px 8px', borderRadius: 100, fontFamily: 'sans-serif' }}>
+                            LIVE
+                        </span>
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {liveOrders.map((o, i) => (
+                            <div key={i} style={{
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                padding: '12px 16px', background: '#f8fafc',
+                                borderRadius: 'var(--radius-md)', border: '1px solid var(--border-gray)',
+                                animation: 'fadeIn 0.4s ease',
+                            }}>
+                                <div>
+                                    <span style={{ fontWeight: 600, color: 'var(--navy)', fontSize: '0.9rem' }}>
+                                        {o.user?.username || 'Unknown'}
+                                    </span>
+                                    {o.book && (
+                                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                                            {' '} bought <em>{o.book.title}</em>
+                                        </span>
+                                    )}
+                                    {o.booksCount && (
+                                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                                            {' '} checked out {o.booksCount} book(s)
+                                        </span>
+                                    )}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <span style={{ fontWeight: 700, color: 'var(--navy)' }}>
+                                        ₹{o.totalAmount}
+                                    </span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                        {new Date(o.createdAt).toLocaleTimeString('en-IN')}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 

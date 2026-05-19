@@ -37,6 +37,18 @@ const userSchema = new mongoose.Schema(
       default: 'user',
     },
 
+    // ── NEW: Profile Picture ──────────────────────────────
+    profilePic: {
+      type: String,
+      default: '',
+    },
+
+    // ── NEW: Wallet Balance (₹100 on signup) ─────────────
+    balance: {
+      type: Number,
+      default: 100,
+    },
+
     // Wishlist Feature
     wishlist: [
       {
@@ -66,6 +78,7 @@ userSchema.pre('save', async function () {
     salt
   );
 });
+
 // Compare passwords
 userSchema.methods.matchPassword =
   async function (enteredPassword) {

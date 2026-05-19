@@ -12,6 +12,7 @@ import Home from './pages/user/Home';
 import BookDetails from './pages/user/BookDetails';
 import CartPage from './pages/user/Cart';
 import PurchasedBooks from './pages/user/PurchasedBooks';
+import UserProfile from './pages/user/UserProfile';   // ← NEW
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -19,8 +20,8 @@ import AddBook from './pages/admin/AddBook';
 import ManageBooks from './pages/admin/ManageBooks';
 import ViewUsers from './pages/admin/ViewUsers';
 import ViewOrders from './pages/admin/ViewOrders';
-import Payments from './pages/admin/Payments';
-import AdminBookDetails from './pages/admin/AdminBookDetails'; // ✅ NEW
+import Payments from './pages/admin/payments';
+import AdminBookDetails from './pages/admin/AdminBookDetails';
 
 import NotFound from './pages/NotFound';
 
@@ -60,6 +61,7 @@ export default function App() {
       <Route path="/books/:id" element={<RequireAuth><BookDetails /></RequireAuth>} />
       <Route path="/cart" element={<RequireAuth><CartPage /></RequireAuth>} />
       <Route path="/purchased" element={<RequireAuth><PurchasedBooks /></RequireAuth>} />
+      <Route path="/profile" element={<RequireAuth><UserProfile /></RequireAuth>} />   {/* ← NEW */}
 
       {/* Admin */}
       <Route path="/admin" element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
@@ -69,7 +71,6 @@ export default function App() {
       <Route path="/admin/users" element={<RequireAdmin><ViewUsers /></RequireAdmin>} />
       <Route path="/admin/orders" element={<RequireAdmin><ViewOrders /></RequireAdmin>} />
       <Route path="/admin/payments" element={<RequireAdmin><Payments /></RequireAdmin>} />
-      {/* ✅ NEW: Admin Book Details route */}
       <Route path="/admin/book/:id" element={<RequireAdmin><AdminBookDetails /></RequireAdmin>} />
 
       <Route path="*" element={<NotFound />} />

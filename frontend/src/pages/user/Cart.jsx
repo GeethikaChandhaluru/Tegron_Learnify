@@ -4,12 +4,14 @@ import Navbar from '../../components/Navbar';
 import Loader from '../../components/Loader';
 import ConfirmModal from '../../components/ConfirmModal';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { checkoutCart, getFileUrl } from '../../services/api';
 import toast from 'react-hot-toast';
 
 export default function CartPage() {
     const navigate = useNavigate();
     const { cart, removeFromCart, clearCartLocal } = useCart();
+    const { user, updateBalance } = useAuth();   // ← updateBalance added
     const [checkingOut, setCheckingOut] = useState(false);
     const [toRemove, setToRemove] = useState(null);
     const [showCheckout, setShowCheckout] = useState(false);
@@ -22,7 +24,11 @@ export default function CartPage() {
         if (items.length === 0) { toast.error('Your cart is empty'); return; }
         setCheckingOut(true);
         try {
-            await checkoutCart();
+            const { data } = await checkoutCart();
+            // Update wallet balance instantly
+            if (data.newBalance !== undefined) {
+                updateBalance(data.newBalance);
+            }
             clearCartLocal();
             toast.success('Order placed successfully! 🎉');
             navigate('/purchased');
@@ -38,6 +44,8 @@ export default function CartPage() {
     };
 
     if (!cart) return <><Navbar /><Loader /></>;
+
+    const insufficientBalance = user && user.balance < totalAmt;
 
     return (
         <>
@@ -56,13 +64,7 @@ export default function CartPage() {
                 <button
                     className="btn btn-outline"
                     onClick={() => navigate('/')}
-                    style={{
-                        borderRadius: '99px',
-                        padding: '9px 20px',
-                        fontSize: '0.85rem',
-                        marginBottom: '28px',
-                        gap: '6px',
-                    }}
+                    style={{ borderRadius: '99px', padding: '9px 20px', fontSize: '0.85rem', marginBottom: '28px', gap: '6px' }}
                 >
                     ← Back to Home
                 </button>
@@ -117,15 +119,34 @@ export default function CartPage() {
                                     </span>
                                 </div>
                             ))}
+
+                            {/* Wallet balance row */}
+                            {user && (
+                                <div className="cart-summary-row" style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border-gray)' }}>
+                                    <span style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>Your Wallet</span>
+                                    <span style={{ fontWeight: 600, color: insufficientBalance ? '#dc2626' : '#16a34a' }}>
+                                        ₹{(user.balance ?? 0).toFixed(2)}
+                                    </span>
+                                </div>
+                            )}
+
                             <div className="cart-summary-row total">
                                 <span>Total</span>
                                 <span style={{ color: 'var(--orange-red)' }}>₹{totalAmt.toFixed(2)}</span>
                             </div>
+
+                            {/* Insufficient balance warning */}
+                            {insufficientBalance && (
+                                <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px', margin: '12px 0', color: '#dc2626', fontSize: '0.82rem' }}>
+                                    ⚠️ Insufficient balance for this order.
+                                </div>
+                            )}
+
                             <button
                                 className="btn btn-primary btn-full"
                                 style={{ marginTop: '20px' }}
                                 onClick={() => setShowCheckout(true)}
-                                disabled={checkingOut}
+                                disabled={checkingOut || insufficientBalance}
                             >
                                 {checkingOut ? 'Processing…' : '🚀 Checkout'}
                             </button>
@@ -158,7 +179,7 @@ export default function CartPage() {
                 <ConfirmModal
                     icon="🚀"
                     title="Confirm Order?"
-                    message={`Place order for ${items.length} book${items.length > 1 ? 's' : ''} totalling ₹${totalAmt.toFixed(2)}?`}
+                    message={`Place order for ${items.length} book${items.length > 1 ? 's' : ''} totalling ₹${totalAmt.toFixed(2)}? Your wallet balance will be updated.`}
                     confirmText="Yes, Place Order"
                     cancelText="Review Cart"
                     danger={false}
