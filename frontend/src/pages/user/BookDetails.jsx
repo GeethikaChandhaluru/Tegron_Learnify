@@ -198,7 +198,14 @@ export default function BookDetails() {
 
                 {/* Comments */}
                 <div style={{ marginTop: 48 }}>
-                    <CommentSection bookId={book._id} />
+                    <CommentSection
+                        bookId={book._id}
+                        comments={book.comments || []}
+                        currentUserId={user?._id}
+                        onCommentsUpdate={(updatedComments) =>
+                            setBook((prev) => ({ ...prev, comments: updatedComments }))
+                        }
+                    />
                 </div>
             </div>
         </>
