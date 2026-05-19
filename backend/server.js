@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
     origin: [
-        "https://tegron_learnify.vercel.app"
+        "https://tegronlearnify.vercel.app"
     ],
     credentials: true
 }));
