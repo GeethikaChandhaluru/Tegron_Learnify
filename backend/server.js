@@ -39,6 +39,24 @@ app.set('io', io);
 
 io.on('connection', (socket) => {
     console.log(`🔌 Socket connected: ${socket.id}`);
+
+    // ── Join user's private room ──────────────────────────────────────────────
+    // The client emits 'joinUserRoom' with their userId right after connecting.
+    // This puts the socket into room "user:<userId>" so the server can target
+    // balance-update events at that specific user without broadcasting to everyone.
+    socket.on('joinUserRoom', (userId) => {
+        if (userId) {
+            socket.join(`user:${userId}`);
+            console.log(`👤 Socket ${socket.id} joined room user:${userId}`);
+        }
+    });
+
+    // ── Join admin room ───────────────────────────────────────────────────────
+    socket.on('joinAdminRoom', () => {
+        socket.join('room:admin');
+        console.log(`🛡️  Socket ${socket.id} joined admin room`);
+    });
+
     socket.on('disconnect', () => {
         console.log(`❌ Socket disconnected: ${socket.id}`);
     });
