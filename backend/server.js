@@ -30,11 +30,14 @@ const io = new Server(server, {
     cors: {
         origin: [
             "http://localhost:5173",
+            "http://127.0.0.1:5173",
             "https://tegronlearnify.vercel.app"
         ],
+        credentials: true
+    }
         methods: ['GET', 'POST'],
-        credentials: true,
-    },
+    credentials: true,
+},
 });
 
 // Make io accessible in controllers via req.app.get('io')
@@ -69,6 +72,7 @@ io.on('connection', (socket) => {
 app.use(cors({
     origin: [
         "http://localhost:5173",
+        "http://127.0.0.1:5173",
         "https://tegronlearnify.vercel.app"
     ],
     credentials: true
